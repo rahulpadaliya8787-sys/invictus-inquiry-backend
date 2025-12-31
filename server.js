@@ -16,8 +16,6 @@ let accessToken = "";
 let tokenExpiry = 0;
 
 async function refreshAccessToken() {
-  console.log("🔄 Refreshing Zoho access token...");
-
   const res = await fetch("https://accounts.zoho.in/oauth/v2/token", {
     method: "POST",
     headers: {
@@ -34,14 +32,12 @@ async function refreshAccessToken() {
   const data = await res.json();
 
   if (!data.access_token) {
-    console.error("❌ Token refresh failed:", data);
+    console.error("Token refresh failed:", data);
     throw new Error("Zoho token refresh failed");
   }
 
   accessToken = data.access_token;
   tokenExpiry = Date.now() + data.expires_in * 1000;
-
-  console.log("✅ Zoho access token updated");
 }
 
 async function ensureToken() {
@@ -62,25 +58,23 @@ app.get("/", (req, res) => {
 ===================================== */
 app.post("/submit-inquiry", async (req, res) => {
   try {
-    console.log("📩 Incoming data:", req.body);
-
     await ensureToken();
 
-    /* ✅ EXACT ZOHO FIELD LINK NAMES (UPPERCASE) */
+    /* 🔥 READ UPPERCASE BODY (EXACT ZOHO FIELD LINK NAMES) */
     const payload = {
       data: {
-        Full_Name: req.body.full_name,
-        Mobile_Number: req.body.mobile_number,
-        Email_Address: req.body.email_address,
-        Destination_Tour_Name: req.body.destination_tour_name,
-        Travel_Date: req.body.travel_date,
-        Travel_Type: req.body.travel_type,
-        Number_of_Travelers: Number(req.body.number_of_travelers),
-        Message_Special_Request: req.body.message_special_request
+        Full_Name: req.body.Full_Name,
+        Mobile_Number: req.body.Mobile_Number,
+        Email_Address: req.body.Email_Address,
+        Destination_Tour_Name: req.body.Destination_Tour_Name,
+        Travel_Date: req.body.Travel_Date,            // YYYY-MM-DD
+        Travel_Type: req.body.Travel_Type,            // EXACT picklist value
+        Number_of_Travelers: Number(req.body.Number_of_Travelers),
+        Message_Special_Request: req.body.Message_Special_Request,
+        Terms_Accepted: "Yes"                          // Checkbox FIX
       }
     };
 
-    /* ✅ CORRECT ZOHO CREATOR URL (NO /records) */
     const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}`;
 
     const zohoRes = await fetch(zohoURL, {
@@ -93,9 +87,9 @@ app.post("/submit-inquiry", async (req, res) => {
     });
 
     const result = await zohoRes.json();
-    console.log("📦 ZOHO RESPONSE:", result);
+    console.log("ZOHO RESPONSE:", result);
 
-    if (result && result.data) {
+    if (result?.data) {
       return res.json({
         status: "success",
         zoho_response: result
@@ -108,7 +102,7 @@ app.post("/submit-inquiry", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("🔥 SERVER ERROR:", error);
+    console.error(error);
     return res.status(500).json({
       status: "server_error",
       message: "Internal Server Error"
@@ -121,5 +115,5 @@ app.post("/submit-inquiry", async (req, res) => {
 ===================================== */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on port ${PORT}`);
+  console.log(`Backend running on port ${PORT}`);
 });
