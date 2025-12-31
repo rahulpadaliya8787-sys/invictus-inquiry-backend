@@ -97,16 +97,19 @@ app.post("/submit-inquiry", async (req, res) => {
 
     console.log("📦 ZOHO RESPONSE:", result);
 
-    // ✅ SUCCESS
-    if (result.code === 3000) {
-      return res.json({ status: "success" });
-    }
+   // Zoho Creator success condition
+if (result && result.data) {
+  return res.json({
+    status: "success",
+    zoho_response: result
+  });
+}
 
-    // ❌ ZOHO ERROR (send back for debugging)
-    return res.json({
-      status: "zoho_error",
-      zoho: result
-    });
+// If Zoho sends error
+return res.status(400).json({
+  status: "error",
+  zoho_response: result
+});
 
   } catch (error) {
     console.error("🔥 SERVER ERROR:", error);
