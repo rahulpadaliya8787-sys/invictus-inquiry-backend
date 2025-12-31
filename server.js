@@ -69,19 +69,19 @@ app.post("/submit-inquiry", async (req, res) => {
     /* ✅ EXACT ZOHO FIELD LINK NAMES (UPPERCASE) */
     const payload = {
       data: {
-        Full_Name: req.body.Full_Name,
-        Mobile_Number: req.body.Mobile_Number,
-        Email_Address: req.body.Email_Address,
-        Destination_Tour_Name: req.body.Destination_Tour_Name,
-        Travel_Date: req.body.Travel_Date,
-        Travel_Type: req.body.Travel_Type,
-        Number_of_Travelers: req.body.Number_of_Travelers,
-        Message_Special_Request: req.body.Message_Special_Request
-        // ❌ Terms_Accepted REMOVED (THIS FIXES 400 ERROR)
+        Full_Name: req.body.full_name,
+        Mobile_Number: req.body.mobile_number,
+        Email_Address: req.body.email_address,
+        Destination_Tour_Name: req.body.destination_tour_name,
+        Travel_Date: req.body.travel_date,
+        Travel_Type: req.body.travel_type,
+        Number_of_Travelers: Number(req.body.number_of_travelers),
+        Message_Special_Request: req.body.message_special_request
       }
     };
 
-    const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}/records`;
+    /* ✅ CORRECT ZOHO CREATOR URL (NO /records) */
+    const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}`;
 
     const zohoRes = await fetch(zohoURL, {
       method: "POST",
@@ -95,7 +95,7 @@ app.post("/submit-inquiry", async (req, res) => {
     const result = await zohoRes.json();
     console.log("📦 ZOHO RESPONSE:", result);
 
-    if (result?.data) {
+    if (result && result.data) {
       return res.json({
         status: "success",
         zoho_response: result
