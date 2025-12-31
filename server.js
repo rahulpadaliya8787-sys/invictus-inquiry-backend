@@ -79,7 +79,7 @@ app.post("/submit-inquiry", async (req, res) => {
       }
     };
 
-    const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}/records`;
+    const zohoURL = `https://www.zohoapis.in/creator/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}/records`;
 
     const zohoRes = await fetch(zohoURL, {
       method: "POST",
