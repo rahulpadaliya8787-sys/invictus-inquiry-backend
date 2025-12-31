@@ -61,19 +61,19 @@ app.post("/submit-inquiry", async (req, res) => {
     await ensureToken();
 
     /* 🔥 READ UPPERCASE BODY (EXACT ZOHO FIELD LINK NAMES) */
-    const payload = {
-      data: {
-        Full_Name: req.body.Full_Name,
-        Mobile_Number: req.body.Mobile_Number,
-        Email_Address: req.body.Email_Address,
-        Destination_Tour_Name: req.body.Destination_Tour_Name,
-        Travel_Date: req.body.Travel_Date,            // YYYY-MM-DD
-        Travel_Type: req.body.Travel_Type,            // EXACT picklist value
-        Number_of_Travelers: Number(req.body.Number_of_Travelers),
-        Message_Special_Request: req.body.Message_Special_Request,
-        Terms_Accepted: "Yes"                          // Checkbox FIX
-      }
-    };
+   const payload = {
+  data: {
+    Full_Name: String(req.body.Full_Name || "").trim(),
+    Mobile_Number: String(req.body.Mobile_Number || "").trim(),
+    Email_Address: String(req.body.Email_Address || "").trim(),
+    Destination_Tour_Name: String(req.body.Destination_Tour_Name || "").trim(),
+    Travel_Date: req.body.Travel_Date, // must be YYYY-MM-DD
+    Travel_Type: String(req.body.Travel_Type || "").trim(), // exact picklist
+    Number_of_Travelers: Number(req.body.Number_of_Travelers),
+    Message_Special_Request: String(req.body.Message_Special_Request || "").trim(),
+    Terms_Accepted: "Yes" // checkbox expects string, not boolean
+  }
+};
 
     const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}`;
 
