@@ -1,4 +1,3 @@
-
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -67,7 +66,7 @@ app.post("/submit-inquiry", async (req, res) => {
 
     await ensureToken();
 
-    /* ✅ EXACT ZOHO FIELD LINK NAMES */
+    // ✅ EXACT ZOHO FIELD LINK NAMES (UPPERCASE)
     const payload = {
       data: {
         Full_Name: req.body.full_name,
@@ -76,13 +75,14 @@ app.post("/submit-inquiry", async (req, res) => {
         Destination_Tour_Name: req.body.destination_tour_name,
         Travel_Date: req.body.travel_date,
         Travel_Type: req.body.travel_type,
-        Number_of_Travelers: req.body.number_of_travelers,
+        Number_of_Travelers: Number(req.body.number_of_travelers),
         Message_Special_Request: req.body.message_special_request,
         Terms_Accepted: true
       }
     };
 
-    const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}/records`;
+    // ✅ CORRECT ZOHO CREATOR FORM URL (NO /records)
+    const zohoURL = `https://creator.zoho.in/api/v2/${process.env.ZOHO_OWNER}/${process.env.ZOHO_APP_LINK}/form/${process.env.ZOHO_FORM_LINK}`;
 
     const zohoRes = await fetch(zohoURL, {
       method: "POST",
