@@ -1,3 +1,4 @@
+
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -15,7 +16,6 @@ app.use(express.json());
 let accessToken = "";
 let tokenExpiry = 0;
 
-// Refresh Zoho Access Token using Refresh Token
 async function refreshAccessToken() {
   console.log("🔄 Refreshing Zoho access token...");
 
@@ -45,7 +45,6 @@ async function refreshAccessToken() {
   console.log("✅ Zoho access token updated");
 }
 
-// Ensure token is valid
 async function ensureToken() {
   if (!accessToken || Date.now() >= tokenExpiry) {
     await refreshAccessToken();
@@ -68,17 +67,18 @@ app.post("/submit-inquiry", async (req, res) => {
 
     await ensureToken();
 
-    // 🔥 Zoho Creator payload (field link names MUST match)
+    /* ✅ EXACT ZOHO FIELD LINK NAMES */
     const payload = {
       data: {
-        full_name: req.body.full_name,
-        mobile_number: req.body.mobile_number,
-        email_address: req.body.email_address,
-        destination_tour_name: req.body.destination_tour_name,
-        travel_date: req.body.travel_date,
-        travel_type: req.body.travel_type,
-        number_of_travelers: req.body.number_of_travelers,
-        message_special_request: req.body.message_special_request
+        Full_Name: req.body.full_name,
+        Mobile_Number: req.body.mobile_number,
+        Email_Address: req.body.email_address,
+        Destination_Tour_Name: req.body.destination_tour_name,
+        Travel_Date: req.body.travel_date,
+        Travel_Type: req.body.travel_type,
+        Number_of_Travelers: req.body.number_of_travelers,
+        Message_Special_Request: req.body.message_special_request,
+        Terms_Accepted: true
       }
     };
 
@@ -94,22 +94,19 @@ app.post("/submit-inquiry", async (req, res) => {
     });
 
     const result = await zohoRes.json();
-
     console.log("📦 ZOHO RESPONSE:", result);
 
-   // Zoho Creator success condition
-if (result && result.data) {
-  return res.json({
-    status: "success",
-    zoho_response: result
-  });
-}
+    if (result && result.data) {
+      return res.json({
+        status: "success",
+        zoho_response: result
+      });
+    }
 
-// If Zoho sends error
-return res.status(400).json({
-  status: "error",
-  zoho_response: result
-});
+    return res.status(400).json({
+      status: "error",
+      zoho_response: result
+    });
 
   } catch (error) {
     console.error("🔥 SERVER ERROR:", error);
@@ -124,7 +121,6 @@ return res.status(400).json({
    START SERVER
 ===================================== */
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
 });
